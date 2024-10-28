@@ -1,0 +1,65 @@
+library ieee;
+use ieee.std_logic_1164.all;
+library work;
+use work.gates.all;
+
+entity univ_shift is
+
+port(A: in std_logic_vector(7 downto 0);
+     L: in std_logic; B: in std_logic_vector(2 downto 0);
+     C: out std_logic_vector(7 downto 0));
+end entity;
+
+architecture struct of univ_shift is
+
+  signal X : std_logic_vector(7 downto 0);
+  signal Z : std_logic_vector(7 downto 0);
+  signal Z1 : std_logic_vector(7 downto 0);
+  signal Z2 : std_logic_vector(7 downto 0);
+
+component mux_2_1 is
+    port(I0,I1 S:in std_logic;
+    Y: out std_logic);
+end component;
+
+begin
+
+rev: for j in 0 to 7 generate
+lsb: if j<8 generate
+b20:mux_2_1 port map(I0 => A(j), I1 => A(7-j), S => L, Y=> X(j));
+end generate lsb;
+end generate rev;
+
+n4_bit : for j in 0 to 7 generate
+lsb: if j<4 generate
+b2: mux_2_1 port map(I0 => X(j), I1 => X(j+4), S=> b(2), Y=> Z(j));
+end generate lsb;
+msb: if j>3 generate 
+b3: mux_2_1 port map(I0 => X(j),I1 => '0', S => b(2), Y => Z(j));
+end generate msb;
+end generate;
+
+n2_bit : for j in 0 to 7 generate
+lsb: if j<6 generate
+b4: mux_2_1 port map(I0 => Z(j), I1 => Z(j+2), S => b(1), Y => Z1(j));
+end generate lsb;
+msb: if j>5 generate
+b5: mux_2_1 port map(I0 => Z(j), I1 => '0', S => b(1), Y=> Z1(j));
+end generate msb;
+end generate;
+
+n1_bit : for j in 0 t0 7 generate
+lsb: if j<7 generate
+b6: mux_2_1 port map(I0 => Z1(j), I1 => Z1(j+1), S => b(0), Y => Z2(j));
+end generate msb;
+end generate;
+
+rev1: for j in 0 to 7 generate
+lsb1: if j<8 generate
+b21: mux_2_1 port map(I0 => Z2(j), I1 => Z2(7-j), S=> L,Y => C(j));
+end generate lssb1;
+end generate rev1;
+
+end architecture;
+
+
